@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NOAA18 Mar 22</title>
   <style>
     body {
@@ -31,15 +31,15 @@
       left: 0;
       width: 100%;
       height: 2px;
-      background-color: white;
+      background-color: black;
       pointer-events: none;
       display: none;
-      box-shadow: 0 0 20px rgba(173, 216, 230, 0.7), 0 0 40px rgba(173, 216, 230, 0.4);
+      box-shadow: 0 0 10px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.4);
     }
 
     .glitch-dot {
       position: absolute;
-      background-color: white;
+      background-color: black;
       width: 1px;
       height: 1px;
       pointer-events: none;
@@ -54,7 +54,7 @@
       height: 100%;
       pointer-events: none;
       opacity: 0.08;
-      background: url('https://via.placeholder.com/200x200') repeat;
+      background: url('https://i.imgur.com/8pQfQ5t.png') repeat; /* example gray noise texture */
       background-size: 200px 200px;
       display: none;
       animation: noiseMove 1s linear infinite;
@@ -78,11 +78,11 @@
 </head>
 <body>
 
-  <h1>NOAA19 May 14 Pass</h1>
+  <h1>NOAA18 Mar 22 Pass</h1>
 
   <!-- Audio player -->
   <audio id="audio" controls>
-    <source src="websdr_recording_start_2025-03-22T10_28_39Z_137912.5kHz-web" type="audio/wav">
+    <source src="websdr_recording_start_2025-03-22T10_28_39Z_137912.5kHz-web.wav" type="audio/wav">
     Your browser does not support the audio element.
   </audio>
 
@@ -117,7 +117,7 @@
     };
 
     function updateScanLine() {
-      const speed = Math.random() * 0.5 + 0.5; // Slower scan speed
+      const speed = Math.random() * 0.5 + 0.5; // Slower scan
       const height = 2 + Math.random() * 12;
       const jitter = (Math.random() - 0.5) * 2;
 
@@ -156,9 +156,6 @@
       scanY = 0;
       scanLine.style.display = 'block';
       noise.style.display = 'block';
-      // Force reload of the noise background image to prevent caching issues
-      const timestamp = new Date().getTime();
-      noise.style.backgroundImage = `url('https://via.placeholder.com/200x200?${timestamp}')`;
       requestAnimationFrame(glitchyScan);
     });
 
@@ -170,7 +167,7 @@
       noise.style.display = 'none';
     });
 
-    // Show JS errors if they happen
+    // Show JS errors
     window.onerror = function (msg, src, lineno, colno, errorObj) {
       error.textContent = `⚠️ JS Error: ${msg} (line ${lineno}:${colno})`;
     };
@@ -178,6 +175,3 @@
 
 </body>
 </html>
-
-
-<!-- force rebuild -->
