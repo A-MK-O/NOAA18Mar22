@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NOAA18 Mar 22</title>
+  <style>
+    body {
+      background-color: #2e2e2e;
+      color: white;
+      font-family: Calibri, sans-serif;
+      text-align: center;
+      padding-top: 30px;
+    }
+
+    #container {
+      position: relative;
+      display: inline-block;
+      max-width: 90%;
+    }
+
+    #scan-image {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+      display: block;
+    }
+
+    #scan-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: white;
+      pointer-events: none;
+      display: none;
+      box-shadow: 0 0 20px rgba(173, 216, 230, 0.7), 0 0 40px rgba(173, 216, 230, 0.4);
+    }
+
+    .glitch-dot {
+      position: absolute;
+      background-color: white;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    #noise {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.08;
+      background: url('https://via.placeholder.com/200x200') repeat;
+      background-size: 200px 200px;
+      display: none;
+      animation: noiseMove 1s linear infinite;
+    }
+
+    @keyframes noiseMove {
+      from { background-position: 0 0; }
+      to { background-position: 50px 50px; }
+    }
+
+    audio {
+      margin-top: 20px;
+      max-width: 90%;
+    }
+
+    #error {
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>NOAA19 May 14 Pass</h1>
+
+  <!-- Audio player -->
+  <audio id="audio" controls>
+    <source src="websdr_recording_start_2025-03-22T10_28_39Z_137912.5kHz-web" type="audio/wav">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Image + scan line + noise -->
+  <div id="container">
+    <img id="scan-image" src="APT-A.png" alt="Satellite Pass">
+    <div id="scan-line"></div>
+    <div id="noise"></div>
+  </div>
+
+  <div id="error"></div>
+
+  <script>
+    const audio = document.getElementById('audio');
+    const scanLine = document.getElementById('scan-line');
+    const image = document.getElementById('scan-image');
+    const container = document.getElementById('container');
+    const noise = document.getElementById('noise');
+    const error = document.getElementById('error');
+
+    let imageHeight = 0;
+    let scanY = 0;
+
+    image.onload = () => {
+      imageHeight = image.offsetHeight;
+      scanLine.style.display = 'block';
+      noise.style.display = 'none';
+    };
+
+    image.onerror = () => {
+      error.textContent = "❌ Error: Image not found. Check the file name.";
+    };
+
+    function updateScanLine() {
+      const speed = Math.random() * 0.5 + 0.5; // Slower scan speed
+      const height = 2 + Math.random() * 12;
+      const jitter = (Math.random() - 0.5) * 2;
+
+      scanY += speed;
+
+      if (scanY >= imageHeight) {
+        scanY = 0;
+      }
+
+      scanLine.style.top = `${scanY}px`;
+      scanLine.style.height = `${height}px`;
+      scanLine.style.transform = `translateX(${jitter}px)`;
+    }
+
+    function createGlitchDots() {
+      for (let i = 0; i < 5; i++) {
+        if (Math.random() > 0.5) {
+          const dot = document.createElement('div');
+          dot.classList.add('glitch-dot');
+          dot.style.top = `${scanY + Math.floor(Math.random() * 4)}px`;
+          dot.style.left = `${Math.floor(Math.random() * container.offsetWidth)}px`;
+          container.appendChild(dot);
+          setTimeout(() => container.removeChild(dot), 300 + Math.random() * 500);
+        }
+      }
+    }
+
+    function glitchyScan() {
+      if (audio.paused || audio.ended || !imageHeight) return;
+      updateScanLine();
+      createGlitchDots();
+      requestAnimationFrame(glitchyScan);
+    }
+
+    audio.addEventListener('play', () => {
+      scanY = 0;
+      scanLine.style.display = 'block';
+      noise.style.display = 'block';
+      // Force reload of the noise background image to prevent caching issues
+      const timestamp = new Date().getTime();
+      noise.style.backgroundImage = `url('https://via.placeholder.com/200x200?${timestamp}')`;
+      requestAnimationFrame(glitchyScan);
+    });
+
+    audio.addEventListener('pause', () => {
+      noise.style.display = 'none';
+    });
+
+    audio.addEventListener('ended', () => {
+      noise.style.display = 'none';
+    });
+
+    // Show JS errors if they happen
+    window.onerror = function (msg, src, lineno, colno, errorObj) {
+      error.textContent = `⚠️ JS Error: ${msg} (line ${lineno}:${colno})`;
+    };
+  </script>
+
+</body>
+</html>
+
+
+<!-- force rebuild -->
